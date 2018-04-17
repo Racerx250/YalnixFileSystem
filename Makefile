@@ -1,56 +1,74 @@
 #
-#	Sample Makefile for COMP 421 Yalnix kernel and user programs.
+#	Sample Makefile for COMP 421 YFS and user programs.
 #
-#	The Yalnix kernel built will be named "yalnix".  *ALL* kernel
-#	Makefiles for this lab must have a "yalnix" rule in them, and
-#	must produce a kernel executable named "yalnix" -- we will run
+#	The YFS server built will be named "yfs".  *ALL* Makefiles
+#	for this lab must have a "yfs" rule in them, and must
+#	produce a YFS server executable named "yfs" -- we will run
 #	your Makefile and will grade the resulting executable
-#	named "yalnix".
-#
-#	Your project must be implemented using the C programming
-#	language (e.g., not in C++ or other languages).
+#	named "yfs".  Likewise, *ALL* Makefiles must have a rule
+#	named "iolib.a" to make your YFS library.
 #
 
 #
-#	Define the list of everything to be made by this Makefile.
-#	The list should include "yalnix" (the name of your kernel),
-#	plus the list of user test programs you also want to be mae
-#	by this Makefile.  For example, the definition below
-#	specifies to make Yalnix test user programs test1, test2,
-#	and test3.  You should modify this list to the list of your
+#	Define the list of user
+#	test programs you also want to be made by this Makefile.
+#	For example, the definition below specifies to make Yalnix
+#	test user programs test1, test2, and test3, all of which will
+#	be linked with your library to enable them to use your
+#	server.  You should modify this list to the list of your
 #	own test programs.
 #
 #	For each user test program, the Makefile will make the
-#	program out of a single correspondingly named sourc file.
+#	program out of a single correspondingly named source file.
+#	In addition to this single source file for each test
+#	program, each program will also be linked with your library.
 #	For example, the Makefile will make test1 out of test1.c,
 #	if you have a file named test1.c in this directory.
 #
-ALL = yalnix
+TEST = 
 
 #
-#	You must modify the KERNEL_OBJS and KERNEL_SRCS definitions
-#	below.  KERNEL_OBJS should be a list of the .o files that
-#	make up your kernel, and KERNEL_SRCS should  be a list of
-#	the corresponding source files that make up your kernel.
+#	Define the list of everything to be made by this Makefile.
+#	The list should include "yfs" (the name of your server) and
+#	"iolib.a" (the name of your library).  This should also 
+#	include $(TEST) so that all of your user test programs
+#	(defined above) are also made by this Makefile.
 #
-KERNEL_OBJS = yalnix.o 
-KERNEL_SRCS = yalnix.c
+ALL = yfs iolib.a $(TEST)
+
+#
+#	You must modify the YFS_OBJS and YFS_SRCS definitions below.
+#	YFS_OBJS should be a list of the .o files that make up your
+#	YFS server, and YFS_SRCS should  be a list of the corresponding
+#	source files that make up your serever.
+#
+YFS_OBJS = yfs.o
+YFS_SRCS = yfs.c
+
+#
+#	You must also modify the IOLIB_OBJS and IOLIB_SRCS definitions
+#	below.  IOLIB_OBJS should be a list of the .o files that make up
+#	your YFS library, and IOLIB_SRCS should  be a list of the
+#	corresponding source files that make up your library.
+#
+IOLIB_OBJS = iolib.o
+IOLIB_SRCS = iolib.c
 
 #
 #	You should not have to modify anything else in this Makefile
 #	below here.  If you want to, however, you may modify things
 #	such as the definition of CFLAGS, for example.
-#
+#	
+
+LANG = gcc
 
 PUBLIC_DIR = /clear/courses/comp421/pub
 
 CPPFLAGS = -I$(PUBLIC_DIR)/include
 CFLAGS = -g -Wall
 
-LANG = gcc
-
 %: %.o
-	$(LINK.o) -o $@ $^ $(LOADLIBES) $(LDLIBS)
+	$(LINK.o) -o $@ $^ iolib.a $(LOADLIBES) $(LDLIBS)
 
 LINK.o = $(PUBLIC_DIR)/bin/link-user-$(LANG) $(LDFLAGS) $(TARGET_ARCH)
 
@@ -60,13 +78,23 @@ LINK.o = $(PUBLIC_DIR)/bin/link-user-$(LANG) $(LDFLAGS) $(TARGET_ARCH)
 
 all: $(ALL)
 
-yalnix: $(KERNEL_OBJS)
-	$(PUBLIC_DIR)/bin/link-kernel-$(LANG) -o yalnix $(KERNEL_OBJS)
+yfs: $(YFS_OBJS)
+	$(LINK.o) -o $@ $^ $(PUBLIC_DIR)/lib/print-yfs.o $(LOADLIBES) $(LDLIBS)
+
+iolib.a: $(IOLIB_OBJS)
+	rm -f $@
+	ar rv $@ $(IOLIB_OBJS)
+	ranlib $@
+
+$(TEST): iolib.a
+
+mkyfs: mkyfs.c
+	$(CC) $(CPPFLAGS) -o mkyfs mkyfs.c
 
 clean:
-	rm -f $(KERNEL_OBJS) $(ALL)
+	rm -f $(YFS_OBJS) $(IOLIB_OBJS) $(ALL)
 
 depend:
-	$(CC) $(CPPFLAGS) -M $(KERNEL_SRCS) > .depend
+	$(CC) $(CPPFLAGS) -M $(YFS_SRCS) $(IOLIB_SRCS) > .depend
 
 #include .depend
