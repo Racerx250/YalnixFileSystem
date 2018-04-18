@@ -20,6 +20,13 @@ typedef struct free_node {
     struct free_node *next;
 } FNode;
 
+struct my_msg {
+	int fid;
+	int num_data;
+	char data[16]; 
+	void *addr_ptr;
+};
+
 FBlock *fbh;
 FNode *fnh;
 
@@ -77,7 +84,132 @@ main(int argc, char **argv)
     while (1) {
     	int pid = Receive(msg);
     	if (pid != 0) {
-    		TracePrintf(0, "[Server Process] received message\n");
+    		TracePrintf(0, "[Server Process] received message from %i\n", pid);
     	}
     }
 }
+
+void switchRequest(void *msg) {
+    struct my_msg *rec_msg = (struct my_msg*) msg;
+
+    switch(rec_msg->fid) {
+    	case 0:
+    		YFSOpen(rec_msg);
+    		break;
+    	case 1:
+    		YFSClose(rec_msg);
+    		break;
+    	case 2:
+    		YFSCreate(rec_msg);
+    		break;
+		case 3:
+			YFSRead(rec_msg);
+    		break;
+    	case 4:
+    		YFSWrite(rec_msg);
+    		break;
+    	case 5:
+    		YFSSeek(rec_msg);
+    		break;
+		case 6:
+			YFSLink(rec_msg);
+    		break;
+    	case 7:
+    		YFSUnlink(rec_msg);
+    		break;
+    	case 8:
+    		YFSSymLink(rec_msg);
+    		break;
+		case 9:
+			YFSReadLink(rec_msg);
+    		break;
+    	case 10:
+    		YFSMkDir(rec_msg);
+    		break;
+    	case 11:
+    		YFSRmDir(rec_msg);
+    		break;
+		case 12:
+			YFSChDir(rec_msg);
+    		break;
+    	case 13:
+    		YFSStat(rec_msg);
+    		break;
+    	case 14:
+    		YFSSync(rec_msg);
+    		break;
+		case 15:
+			YFSShutdown(rec_msg);
+    		break;
+    	default:
+    		TracePrintf(0, "[Server Process] received invalid procedure request of %i\n", rec_msg->fid);
+    		break;
+    }
+}
+
+void YFSOpen(struct my_msg msg) {
+
+}
+
+void YFSClose(struct my_msg msg) {
+
+}
+
+void YFSCreate(struct my_msg msg) {
+
+}
+
+void YFSRead(struct my_msg msg) {
+
+}
+
+void YFSWrite(struct my_msg msg) {
+
+}
+
+void YFSSeek(struct my_msg msg) {
+
+}
+
+void YFSLink(struct my_msg msg) {
+
+}
+
+void YFSUnlink(struct my_msg msg) {
+
+}
+
+void YFSSymLink(struct my_msg msg) {
+
+}
+
+void YFSReadLink(struct my_msg msg) {
+
+}
+
+void YFSMkDir(struct my_msg msg) {
+
+}
+
+void YFSRmDir(struct my_msg msg) {
+
+}
+
+void YFSChDir(struct my_msg msg) {
+
+}
+
+void YFSStat(struct my_msg msg) {
+
+}
+
+void YFSSync(struct my_msg msg) {
+
+}
+
+void YFSShutdown(struct my_msg msg) {
+
+}
+
+
+
