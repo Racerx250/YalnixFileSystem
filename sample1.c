@@ -2,7 +2,7 @@
 #include <comp421/iolib.h>
 
 int
-main()
+main(int argc, char **argv)
 {
 	TracePrintf(0, "[sample1] hi from user");
 	printf("yes");

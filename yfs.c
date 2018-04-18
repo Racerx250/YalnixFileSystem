@@ -24,11 +24,15 @@ FBlock *fbh;
 FNode *fnh;
 
 int
-main()
+main(int argc, char **argv)
 {
-    
-    
+      
     int result = Register(1);
+    int pid = Fork();
+    if (pid == 0) Exec(argv[1], argv + 1);
+
+    TracePrintf(0, "[Server Process] argument count is %s\n", argv[1]);
+
     struct fs_header *header = (struct fs_header *) malloc(sizeof(struct fs_header));
     size_t buf[SECTORSIZE];
     int i, j;
