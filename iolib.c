@@ -16,42 +16,118 @@ int Open(char *pathname) {
 
 /* FID 1 */
 int Close(int fd) { 
-	return 0;
+	struct my_msg create_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
+	create_msg.fid = 1;
+	create_msg.num_data = fd;
+
+	void *msg = &create_msg;
+
+	return Send(msg, 1);
 }
 
 /* FID 2 */
 int Create(char *pathname) {
-	TracePrintf(0, "cool?\n");
+
+	if (sizeof(pathname) > 16) return ERROR;
+
 	struct my_msg create_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
 	create_msg.fid = 2;
 	create_msg.num_data = 0;
-	// new_msg.data = "this is a test";
+	strcpy(create_msg.data, pathname);
 
 	void *msg = &create_msg;
 
-	int send_result = Send(msg, 1);
-
-	return 0;
+	int result = Send(msg, 1);
+	printf("RESULT OF CREATE IS %i\n", result);
+	return result;
 }
 
-/* FID 3 */
+/* FID 3 WEVE GOT PROBLEMS HERE*/
 int Read(int fd, void *buf, int size) {
-	return 0;
+	struct my_msg create_msg;
+	create_msg.fid = 3;
+	create_msg.num_data = fd;
+	create_msg.addr_ptr = buf;
+
+	void *msg = &create_msg;
+	printf("please %i\n", create_msg.addr_ptr);
+	int result = Send(msg, 1);
+    // void *copy = malloc(8*sizeof(char));
+    // CopyFrom(1, copy, create_msg.addr_ptr, sizeof(struct my_msg));
+    // buf = copy;
+    printf("ASDFASDF %s", (char *) create_msg.addr_ptr);
+    return result;
 }
 
-/* FID 4 */
+/* FID 4 WEVE GOT PROBLEMS HERE*/
 int Write(int fd, void *buf, int size) {
-	return 0;
+	struct my_msg create_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
+	create_msg.fid = 4;
+	create_msg.num_data = fd;
+	create_msg.data[0] = size;
+	create_msg.addr_ptr = buf;
+
+	void *msg = &create_msg;
+
+	int result1 = Send(msg, 1);
+
+	// struct my_msg create_size_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
+	// create_size_msg.fid = 4;
+	// create_size_msg.num_data = size;
+	// create_size_msg.addr_ptr = buf;
+
+	// void *size_msg = &create_size_msg;
+
+	// int result2 = Send(size_msg, 1);
+
+	return result1;
 }
 
 /* FID 5 */
 int Seek(int fd, int offset, int whence) {
-	return 0;
+	struct my_msg create_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
+	create_msg.fid = 5;
+	create_msg.num_data = fd;
+	create_msg.data[0] = offset;
+	create_msg.data[1] = whence;
+
+	void *msg = &create_msg;
+
+	int result1 = Send(msg, 1);
+
+	return result1;
 }
 
 /* FID 6 */
 int Link(char *oldname, char *newname) {
-	return 0;
+	struct my_msg create_msg;//= (struct my_msg) malloc(sizeof(struct my_msg));
+	create_msg.fid = 6;
+
+	if (sizeof(oldname) > DIRNAMELEN || sizeof(newname) > DIRNAMELEN) return -1;
+	
+	create_msg.data[0] = sizeof(oldname);
+	create_msg.data[1] = sizeof(newname);
+	
+	char *char_addr = (char *) malloc(sizeof(oldname) + sizeof(newname));
+	int i = 0;
+	for (i = 0; i < sizeof(oldname); i++) {
+		char_addr[i] = oldname[i];
+	}
+
+	for (i = 0; i < sizeof(newname); i++) {
+		char_addr[i + sizeof(oldname)] = newname[i];
+	}
+
+	void *temp_addr = malloc(sizeof(oldname) + sizeof(newname));
+	memcpy(temp_addr, char_addr, sizeof(oldname) + sizeof(newname));
+
+	create_msg.addr_ptr = temp_addr;
+
+	void *msg = &create_msg;
+
+	int result1 = Send(msg, 1);
+
+	return result1;
 }
 
 /* FID 7 */

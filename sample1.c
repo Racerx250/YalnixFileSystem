@@ -4,36 +4,37 @@
 int
 main(int argc, char **argv)
 {
-	TracePrintf(0, "[sample1] hi from user");
-	printf("yes");
-
 	int fd;		
 
 	fd = Create("a");
 	Write(fd, "aaaaaaaaaaaaaaaa", 16);
+
+	void *buf = malloc(8*sizeof(char));
+	Read(fd, buf, 16);
+	printf("USER \t %s\n", (char *) buf);
 	Close(fd);
 
-	fd = Create("b");
-	Write(fd, "bbbbbbbbbbbbbbbb", 16);
-	Close(fd);
+	// fd = Create("b");
+	// Write(fd, "bbbbbbbbbbbbbbbb", 16);
+	// Close(fd);
 
-	fd = Create("c");
-	Write(fd, "cccccccccccccccc", 16);
-	Close(fd);
+	// fd = Create("c");
+	// Write(fd, "cccccccccccccccc", 16);
+	// Close(fd);
 
-	MkDir("dir");
+	// MkDir("dir");
 
-	fd = Create("/dir/x");
-	Write(fd, "xxxxxxxxxxxxxxxx", 16);
-	Close(fd);
+	// fd = Create("/dir/x");
+	// Write(fd, "xxxxxxxxxxxxxxxx", 16);
+	// Close(fd);
 
-	fd = Create("/dir/y");
-	Write(fd, "yyyyyyyyyyyyyyyy", 16);
-	Close(fd);
+	// fd = Create("/dir/y");
+	// Write(fd, "yyyyyyyyyyyyyyyy", 16);
+	// Close(fd);
 
-	fd = Create("/dir/z");
-	Write(fd, "zzzzzzzzzzzzzzzz", 16);
-	Close(fd);
+	// fd = Create("/dir/z");
+	// Write(fd, "zzzzzzzzzzzzzzzz", 16);
+	// Close(fd);
 
-	Shutdown();
+	// Shutdown();
 }
